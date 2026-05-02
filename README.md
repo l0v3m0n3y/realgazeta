@@ -7,7 +7,7 @@ import realgazeta
 let client = Realgazeta()
 
 do {
-    let content = try await client.get_content("authors/slug/sofiia/")
+    let content = try await client.get_content(content_path: "authors/slug/sofiia/")
     print(content)
 } catch {
     print("Error: \(error)")
