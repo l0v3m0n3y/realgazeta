@@ -20,6 +20,14 @@ extension URLSession {
     }
 }
 
+public enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+    case patch = "PATCH"
+}
+
 public class Realgazeta{
     private let api = "https://realgazeta.com.ua/ghost/api"
     private let key = "9a522231cecde5421b239b663b"
