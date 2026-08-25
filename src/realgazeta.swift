@@ -36,40 +36,21 @@ public class Realgazeta{
 
     }
     
-    public func get_content(content_path: String) async throws -> Any {
-        let urlString = "\(api)/content/\(content_path)?key=\(key)&fields=&include=count.posts%2Cfollowers"
-        guard let url = URL(string: urlString) else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return try JSONSerialization.jsonObject(with: data)
+    public func getContent(contentPath: String) async throws -> Any {
+        return try await fetchJSON(from: "\(api)/content/\(contentPath)?key=\(key)&fields=&include=count.posts%2Cfollowers")
     }
     
     public func search(q: String,limit: Int? = 12,page: Int? = 0) async throws -> Any {
-        var components = URLComponents(string: "\(api)/content/search/all/")
-        var queryItems = [
-        URLQueryItem(name: "search", value: q),
-        URLQueryItem(name: "fields", value: "id,title,url,slug,custom_excerpt,excerpt"),
-        URLQueryItem(name: "include", value: "posts,tags,authors,tags.count.posts,tags.count.followers,authors.count.posts,authors.count.followers"),
-        URLQueryItem(name: "key", value: key)
-        ]
+        var queryItems = ["search": q,"fields": "id,title,url,slug,custom_excerpt,excerpt","include": "posts,tags,authors,tags.count.posts,tags.count.followers,authors.count.posts,authors.count.followers","key": key]
+        
         if let limit = limit {
-            queryItems.append(URLQueryItem(name: "limit", value: String(limit)))
+            queryItems["limit"] = String(limit)
         }
+        
         if let page = page {
-            queryItems.append(URLQueryItem(name: "page", value: String(page)))
+            queryItems["page"] = String(page)
         }
-        components?.queryItems = queryItems
-        guard let url = components?.url else {
-            throw URLError(.badURL)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return try JSONSerialization.jsonObject(with: data)
+        
+        return try await fetchJSON(from: "\(api)/content/search/all/",queryParameters: queryParameters.isEmpty ? nil : queryParameters)
     }
 }
